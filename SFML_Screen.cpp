@@ -69,6 +69,7 @@ int main() {
     sf::CircleShape ball;
     ball.setRadius(30);
     ball.setFillColor(sf::Color::Red);
+    bool boom = false;
 
     while (window.isOpen()) {
 
@@ -177,20 +178,38 @@ int main() {
 
         // Destruction du terrain
         mousePosition = sf::Mouse::getPosition(window);
-        ball.setPosition(sf::Vector2f(mousePosition.x-ball.getRadius(), mousePosition.y-ball.getRadius()));
+        // ball.setPosition(sf::Vector2f(mousePosition.x-ball.getRadius(), mousePosition.y-ball.getRadius()));
         if(sf::Mouse::isButtonPressed(sf::Mouse::Button::Left)){
-            int x_ball = ball.getPosition().x;
-            int y_ball = ball.getPosition().y;
-            int x_center = x_ball+ball.getRadius();
-            int y_center = y_ball+ball.getRadius();
-            for(int y = y_ball; y < y_ball+2*(y_center-y_ball); y++){
-                for(int x = x_ball; x < x_ball+2*(x_center-x_ball); x++){
-                    if(sqrtf(powf(x-x_center, 2)+powf(y-y_center, 2))<ball.getRadius()){
-                        if((x < map.getXsize() && x > -1) && (y < map.getYsize() && y > -1))
-                        mapArray[x][y] = 0;
-                        map.setChangeState();
+            if(boom==false && ball.getRadius()==0){
+                boom = true;
+                ball.setPosition(sf::Vector2f(mousePosition.x, mousePosition.y));
+            }
+        }
+        if(boom==true){
+            ball.setRadius(ball.getRadius()+5);
+            ball.setPosition(ball.getPosition().x-5, ball.getPosition().y-5);
+            if(ball.getRadius()>=30){
+                boom = false;
+                int x_ball = ball.getPosition().x;
+                int y_ball = ball.getPosition().y;
+                int x_center = x_ball+ball.getRadius();
+                int y_center = y_ball+ball.getRadius();
+                for(int y = y_ball; y < y_ball+2*(y_center-y_ball); y++){
+                    for(int x = x_ball; x < x_ball+2*(x_center-x_ball); x++){
+                        if(sqrtf(powf(x-x_center, 2)+powf(y-y_center, 2))<ball.getRadius()){
+                            if((x < map.getXsize() && x > -1) && (y < map.getYsize() && y > -1))
+                            mapArray[x][y] = 0;
+                            map.setChangeState();
+                        }
                     }
                 }
+            }
+        } else {
+            ball.setRadius(ball.getRadius()-5);
+            if(ball.getRadius()>0){
+                ball.setPosition(ball.getPosition().x+5, ball.getPosition().y+5);
+            } else {
+                ball.setRadius(0);
             }
         }
 
