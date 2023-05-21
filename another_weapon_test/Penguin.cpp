@@ -2,8 +2,7 @@
 #include <fstream>
 #include <cstring>
 #include <chrono>
-#include <cmath>
-#include "test_vincent.hpp"
+#include "Penguin.hpp"
 
 Penguin::Penguin(std::string name, int team){
 
@@ -27,9 +26,7 @@ Penguin::Penguin(std::string name, int team){
 
     this->name=name;
 
-    this->speed=0.06;
-
-    std::cout << speed << std::endl;
+    this->speed=1.f*this->penguin.getScale().x;
 
     this->bounds.setPrimitiveType(sf::Points);
     this->bounds.resize(5);
@@ -39,7 +36,7 @@ Penguin::Penguin(std::string name, int team){
     this->bounds[3].position = sf::Vector2f(x+0.5*w, y+h);
     this->bounds[4].position = sf::Vector2f(x+0.25*w, y+h/3);
 
-    this->activeArea.setSize(sf::Vector2f(w, h));
+    this->activeArea.setSize(sf::Vector2f(w, h)); //dessine le rectangle magenta autour du penguin
     this->activeArea.setPosition(x,y);
     this->activeArea.setFillColor(sf::Color::Magenta); 
 
@@ -126,11 +123,11 @@ void Penguin::setPosition(float x, float y){
     }
 }
 
-void Penguin::move(float x_speed, float y_speed, float dt){
-    this->penguin.move(x_speed*dt, y_speed*dt);
-    this->activeArea.move(x_speed*dt, y_speed*dt);
+void Penguin::move(float x_speed, float y_speed){
+    this->penguin.move(x_speed, y_speed);
+    this->activeArea.move(x_speed, y_speed);
     for(int i=0; i<5; i++){
-        this->bounds[i].position += sf::Vector2f(x_speed*dt, y_speed*dt);
+        this->bounds[i].position += sf::Vector2f(x_speed, y_speed);
     }
 }
 
@@ -154,7 +151,7 @@ float Penguin::getSpeed(){
 
 
 
-int main() {
+/*int main() {
     std::ifstream file("map1.txt");
     std::string data;
     file >> data;
@@ -175,9 +172,7 @@ int main() {
 
     Penguin marcus("Marcus", 0);
 
-    sf::Clock clock_frame;
-    float prev_clock = 0;
-    sf::Clock now_clock;
+    sf::Clock clock;
     
     sf::RenderWindow window(sf::VideoMode(1000, 700), "test");
     sf::RectangleShape zone(sf::Vector2f(900, 600));
@@ -197,15 +192,6 @@ int main() {
     int height = 0;
     sf::Keyboard::Key lastKey;
 
-    sf::CircleShape ball(6);
-    float g = 1;
-    float v = 15;
-    float a = 45;
-    float h = 0;
-
-    ball.setFillColor(sf::Color::Red);
-    ball.setPosition(sf::Vector2f(0, 699));
-
     while (window.isOpen()) {
 
         sol.resize(0);
@@ -218,74 +204,64 @@ int main() {
             }
         }
 
-        float x_dir = 0;
-        float y_dir = 0;
-
-        if (sf::Keyboard::isKeyPressed(sf::Keyboard::Left)){
-            x_dir = -1;
+        if (sf::Keyboard::isKeyPressed(sf::Keyboard::Left)) {
+            if(map[(int)marcus.getBounds()[4].position.x-1][(int)marcus.getBounds()[4].position.y]==0) {
+                marcus.move(-marcus.getSpeed(), 0.f);
+                if(map[(int)marcus.getBounds()[3].position.x-1][(int)marcus.getBounds()[3].position.y]==1){
+                    marcus.move(0.f, -marcus.getSpeed());
+                }
+            }
             lastKey=sf::Keyboard::Left;
         }
-        if (sf::Keyboard::isKeyPressed(sf::Keyboard::Right)){
-            x_dir = 1;
+        if (sf::Keyboard::isKeyPressed(sf::Keyboard::Right)) {
+            if(map[(int)marcus.getBounds()[2].position.x+1][(int)marcus.getBounds()[2].position.y]==0) {
+                marcus.move(marcus.getSpeed(), 0.f);
+                if(map[(int)marcus.getBounds()[3].position.x+1][(int)marcus.getBounds()[3].position.y]==1){
+                    marcus.move(0.f, -marcus.getSpeed());
+                }
+            }
             lastKey=sf::Keyboard::Right;
         }
-        if (sf::Keyboard::isKeyPressed(sf::Keyboard::Space)){
+        if (sf::Keyboard::isKeyPressed(sf::Keyboard::Space)) {
             if(jump==false && map[(int)marcus.getBounds()[3].position.x][(int)marcus.getBounds()[3].position.y+1]==1){
                 jump=true;
             }
             lastKey=sf::Keyboard::Space;
         }
 
-        if(map[(int)marcus.getBounds()[3].position.x+(int)x_dir][(int)marcus.getBounds()[3].position.y]==1){
-            y_dir = -1;
-        }
-
         if(jump==false){
             if(map[(int)marcus.getBounds()[3].position.x][(int)marcus.getBounds()[3].position.y]==0) {
-                y_dir = 1;
+                marcus.move(0.f, marcus.getSpeed());
                 height=0;
             }
         } else {
             if(height<20 && map[(int)marcus.getBounds()[0].position.x][(int)marcus.getBounds()[0].position.y-1]==0 && map[(int)marcus.getBounds()[1].position.x][(int)marcus.getBounds()[1].position.y-1]==0){
-                y_dir = -1;
+                marcus.move(0.f, -marcus.getSpeed());
                 height++;
             } else {
                 jump=false;
             }
         }
 
-        float dt = now_clock.getElapsedTime().asMilliseconds()-prev_clock;
-        marcus.move(x_dir*marcus.getSpeed(), y_dir*marcus.getSpeed(), dt);
-
-        float xball = v*cos((a*M_PI)/180)*frame;
-        float yball = (-g/2)*frame*frame+v*sin((a*M_PI)/180)*frame+h;
-        ball.setPosition(sf::Vector2f(xball, 600-yball));
-
         sf::Event event;
         while (window.pollEvent(event)) {
             if (event.type == sf::Event::Closed) {
                 window.close();
             }
-
-            
         }
 
-        //std::cout << clock_frame.getElapsedTime().asMilliseconds() << std::endl;
+        while(clock.getElapsedTime().asMilliseconds()<16);
 
-        if(clock_frame.getElapsedTime().asMilliseconds()>16){
-            frame = marcus.animation(frame, lastKey);
-            //std::cout << clock_frame.getElapsedTime().asMilliseconds() << std::endl;
-            clock_frame.restart();
-        }
+        frame = marcus.animation(frame, lastKey);
         window.clear();
         window.draw(zone);
         window.draw(sol);
         window.draw(marcus.getArea());
         window.draw(marcus.getPenguin());
-        window.draw(ball);
         window.display();
+        clock.restart();
         
-        prev_clock = now_clock.getElapsedTime().asMilliseconds();
     }
     return 0;
 }
+*/
