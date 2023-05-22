@@ -64,6 +64,20 @@ int main() {
     // Génération de la carte
     map.reset();
 
+    // Timer pour un tour
+    int turn_time = 3;
+    sf::Clock timer;
+
+    // Police pour le texte a afficher
+    sf::Font font;
+    //font.loadFromFile("planet beson 2.otf");
+    font.loadFromFile("Animated.ttf");
+
+    sf::Text text;
+    text.setFont(font);
+    text.setFillColor(sf::Color::White);
+    text.setOutlineColor(sf::Color::Black);
+
     // Pour test de la destruction de la carte
     sf::Vector2i mousePosition;
     sf::CircleShape ball;
@@ -72,6 +86,15 @@ int main() {
     bool boom = false;
 
     while (window.isOpen()) {
+
+        text.setCharacterSize(30);
+        text.setOutlineThickness(5);
+        if(turn_time-timer.getElapsedTime().asSeconds()>9){
+            text.setString("0:"+std::to_string((int)(turn_time-timer.getElapsedTime().asSeconds())));
+        } else {
+            text.setString("0:0"+std::to_string((int)(turn_time-timer.getElapsedTime().asSeconds())));
+        }
+        text.setPosition(10, 10);
 
         // Selection du penguin à contrôler
         onFocus = changePenguin(equipe0, equipe1);
@@ -238,32 +261,37 @@ int main() {
 
         window.draw(onFocus->getPenguin());
 
+        window.draw(text);
+
         window.display();
 
         // Changement du penguin à contrôler
-        if(sf::Keyboard::isKeyPressed(sf::Keyboard::A)){
-            onFocus->setFocus(false);
-            equipe0.getJoueur1()[0]->setFocus(true);
-        }
-        if(sf::Keyboard::isKeyPressed(sf::Keyboard::Z)){
-            onFocus->setFocus(false);
-            equipe0.getJoueur1()[1]->setFocus(true);
-        }
-        if(sf::Keyboard::isKeyPressed(sf::Keyboard::E)){
-            onFocus->setFocus(false);
-            equipe0.getJoueur1()[2]->setFocus(true);
-        }
-        if(sf::Keyboard::isKeyPressed(sf::Keyboard::R)){
-            onFocus->setFocus(false);
-            equipe1.getJoueur2()[0]->setFocus(true);
-        }
-        if(sf::Keyboard::isKeyPressed(sf::Keyboard::T)){
-            onFocus->setFocus(false);
-            equipe1.getJoueur2()[1]->setFocus(true);
-        }
-        if(sf::Keyboard::isKeyPressed(sf::Keyboard::Y)){
-            onFocus->setFocus(false);
-            equipe1.getJoueur2()[2]->setFocus(true);
+        if(turn_time-timer.getElapsedTime().asSeconds()<0){
+            if(equipe0.getJoueur1()[0]->getFocus()){
+                onFocus->setFocus(false);
+                equipe1.getJoueur2()[0]->setFocus(true);
+            }
+            else if(equipe0.getJoueur1()[1]->getFocus()){
+                onFocus->setFocus(false);
+                equipe1.getJoueur2()[1]->setFocus(true);
+            }
+            else if(equipe0.getJoueur1()[2]->getFocus()){
+                onFocus->setFocus(false);
+                equipe1.getJoueur2()[2]->setFocus(true);
+            }
+            else if(equipe1.getJoueur2()[0]->getFocus()){
+                onFocus->setFocus(false);
+                equipe0.getJoueur1()[1]->setFocus(true);
+            }
+            else if(equipe1.getJoueur2()[1]->getFocus()){
+                onFocus->setFocus(false);
+                equipe0.getJoueur1()[2]->setFocus(true);
+            }
+            else if(equipe1.getJoueur2()[2]->getFocus()){
+                onFocus->setFocus(false);
+                equipe0.getJoueur1()[0]->setFocus(true);
+            }
+            timer.restart();
         }
 
     }
