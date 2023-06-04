@@ -13,6 +13,6 @@ ROB 4
 Pour ce projet, on utilise la bibliothèque SFML <br>
 Installation de SFML: >>sudo apt-get install libsfml-dev
 
-## Utilisation
+## Utilisation du jeu
 
-## Organisation
+## Commentaires et organisation
