@@ -3,11 +3,15 @@ Worms like game but with penguins
 
 ## Noms
 IBRAHIM ANWAR AHMED Yara <br>
-RIVIERE Vincent
+RIVIERE Vincent <br>
 ROB 4 
 
-## Installation
+## Description du jeu 
 
+
+## Installation
+Pour ce projet, on utilise la bibliothèque SFML <br>
+Installation de SFML: >>sudo apt-get install libsfml-dev
 
 ## Utilisation
 
