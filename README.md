@@ -2,7 +2,7 @@
 Worms like game but with penguins
 
 ## Noms
-IBRAHIM ANWAR AHMED Yara
+IBRAHIM ANWAR AHMED Yara <br>
 RIVIERE Vincent
 ROB 4 
 
